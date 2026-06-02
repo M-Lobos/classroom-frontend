@@ -941,25 +941,29 @@ import { BACKEND_BASE_URL } from "@/constants"
 import { ListResponse } from "@/types/types";
 import { createDataProvider, CreateDataProviderOptions } from "@refinedev/rest"
 
+//.env backend url validation
+if (!BACKEND_BASE_URL) {
+    throw new Error('BACKEND_BASE_URL is not properly configured.Plase set BACK_BASE_URL in your .env file.')
+}
+
 const options: CreateDataProviderOptions = {
     getList: {
         getEndpoint: ({ resource }) => resource,
 
-        //QUERY PARAMS
         buildQueryParams: async ({ resource, pagination, filters }) => {
             const page = pagination?.currentPage ?? 1;
             const pageSize = pagination?.pageSize ?? 10;
 
-            const params: Record<string, string|number> = { page, limit: pageSize };
+            const params: Record<string, string | number> = { page, limit: pageSize };
 
             filters?.forEach((filter) => {
                 const field = 'field' in filter ? filter.field : '';
                 //cast it in to string for params
                 const value = String(filter.value);
-                
-                if(resource === 'subjects') {
-                    if(field === 'department') params.department = value;
-                    if(field === 'name' || field === 'code') params.search = value;
+
+                if (resource === 'subjects') {
+                    if (field === 'department') params.department = value;
+                    if (field === 'name' || field === 'code') params.search = value;
                 }
             });
 
@@ -967,13 +971,13 @@ const options: CreateDataProviderOptions = {
         },
 
         mapResponse: async (response) => {
-            const payload: ListResponse = await response.json();
+            const payload: ListResponse = await response.clone().json();
 
             return payload.data ?? [];
         },
 
         getTotalCount: async (response) => {
-            const payload: ListResponse = await response.json();
+            const payload: ListResponse = await response.clone().json();
 
             return payload.pagination?.total ?? payload.data?.length ?? 0;
         }
