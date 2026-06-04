@@ -22,11 +22,19 @@ export const subjectSchema = z.object({
         .min(2, "Subject department must be at least 2 characters"),
 });
 
-const scheduleSchema = z.object({
-    day: z.string().min(1, "Day is required"),
-    startTime: z.string().min(1, "Start time is required"),
-    endTime: z.string().min(1, "End time is required"),
-});
+const scheduleSchema = z
+    .object({
+        day: z.string().min(1, "Day is required"),
+        startTime: z.string().min(1, "Start time is required"),
+        endTime: z.string().min(1, "End time is required"),
+    })
+    .refine(
+        ({ startTime, endTime }) => startTime < endTime,
+        {
+            message: "End time must be after start time",
+            path: ["endTime"],
+        },
+    );
 
 export const classSchema = z.object({
     name: z
@@ -52,7 +60,7 @@ export const classSchema = z.object({
     status: z.enum(["active", "inactive"]),
     bannerUrl: z
         .string({ required_error: "Class banner is required" })
-        .min(1, "Class banner is required"),
+        .url("Class banner must be a valid URL"),
     bannerCldPubId: z
         .string({ required_error: "Banner reference is required" })
         .min(1, "Banner reference is required"),
