@@ -1000,8 +1000,639 @@ git push
 git push --set-upstream origin feat/rest-data-provider
 ```
 
+If name or code is typed in the search bar, it should work. Now, to implement the mechanism to make the deparment's filter through the display list element a get request that calls the department router, and then display it (instead of the 'fake' data currently being displayed). this will be address later on.
+
+## Create Class Form 
+To submit a class to the DB with all needed information related (class name, description, code, teacher, etc), use `react-hook-form` and `Zod`. To do so, create a new `route` `component` (remember that view of routes in the fronten built on `Refine` lives in the `pages folder`, and the routing is in the `app.ts`) by creating a new folder inside `pages` called `classes`, and a new file whitin called `list.tsx`, this will be worked quite similar as the job done with the  inside `subject` folder. Also, craete a new route `component` (inside `pages` folder) called `craete.tsx` (this latest will be responsable for rendering a form to craete a new class).
+
+Now, as mentioned; To define the class routes, go to the `App.tsx` file, and address the `resources={[...]}`(where are defined dashboard and subjects) inside the `<refine >` tag inside `App.tsx`, also adding it as a new route in the `<route>` element, as shown:
+```tsx
+import { Refine, /* WelcomePage */ } from "@refinedev/core";
+import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
+import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
+import routerProvider, {
+  DocumentTitleHandler,
+  UnsavedChangesNotifier,
+} from "@refinedev/react-router";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router";
+import "./App.css";
+import { Toaster } from "./components/refine-ui/notification/toaster";
+import { useNotificationProvider } from "./components/refine-ui/notification/use-notification-provider";
+import { ThemeProvider } from "./components/refine-ui/theme/theme-provider";
+import Dashboard from "./pages/Dashboard";
+import { BookOpen, GraduationCap, Home } from "lucide-react";
+import { Layout } from "./components/refine-ui/layout/layout";
+import SubjectList from "./pages/subjects/List";
+import SubjectsCreate from "./pages/subjects/Create";
+import { dataProvider } from "./providers/restData";
+import ClassesList from "./pages/classes/list";
+import ClassesCreate from "./pages/classes/create";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <RefineKbarProvider>
+        <ThemeProvider>
+          <DevtoolsProvider>
+            <Refine
+              dataProvider={dataProvider}
+              notificationProvider={useNotificationProvider()}
+              routerProvider={routerProvider}
+              options={{
+                syncWithLocation: true,
+                warnWhenUnsavedChanges: true,
+              }}
+              resources={[
+                {
+                  name: 'dashboard',
+                  list: '/',
+                  meta: {
+                    label: 'home',
+                    icon: <Home />
+                  }
+                },
+                {
+                  name: 'subjects',
+                  list: '/subjects',
+                  create: '/subjects/create',
+                  meta: {
+                    label: 'Subjects',
+                    icon: <BookOpen />
+                  }
+                },
+                {
+                  name: 'classes',
+                  list: '/classes',
+                  create: '/classes/create',
+                  meta: {
+                    label: 'Classes',
+                    icon: <GraduationCap />
+                  }
+                },
+              ]}
+            >
+              <Routes>
+                <Route element={
+                  <Layout>
+                    <Outlet />
+                  </Layout>
+                }>
+
+                  <Route path="/" element={<Dashboard />} />
+
+                  <Route path="/subjects">
+                    <Route index element={<SubjectList />} />
+                    <Route path="create" element={<SubjectsCreate />} />
+                  </Route>
+
+                  <Route path="/classes">
+                    <Route index element={<ClassesList />} />
+                    <Route path="create" element={<ClassesCreate />} />
+                  </Route>
+
+                </Route>
+              </Routes>
+              <Toaster />
+              <RefineKbar />
+              <UnsavedChangesNotifier />
+              <DocumentTitleHandler />
+            </Refine>
+            <DevtoolsPanel />
+          </DevtoolsProvider>
+        </ThemeProvider>
+      </RefineKbarProvider>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
+Dont rush, take in count there will be a button on the classes page that will target the create page.
+
+Zod library will be used to define a Zod Schema to validate form inputs and make sure the user is submitting the right form. This way the data structure and types that the app will recive can be validated in runtime. Go to lib folder, and create a schema.ts file:
+```ts
+import * as z from "zod";
+
+export const facultySchema = z.object({
+    name: z.string().min(2, "Name must be at least 2 characters"),
+    email: z.string().email("Invalid email address"),
+    role: z.enum(["admin", "teacher", "student"], {
+        required_error: "Please select a role",
+    }),
+    department: z.string(),
+    image: z.string().optional(),
+    imageCldPubId: z.string().optional(),
+});
+
+export const subjectSchema = z.object({
+    name: z.string().min(3, "Subject name must be at least 3 characters"),
+    code: z.string().min(5, "Subject code must be at least 5 characters"),
+    description: z
+        .string()
+        .min(5, "Subject description must be at least 5 characters"),
+    department: z
+        .string()
+        .min(2, "Subject department must be at least 2 characters"),
+});
+
+const scheduleSchema = z.object({
+    day: z.string().min(1, "Day is required"),
+    startTime: z.string().min(1, "Start time is required"),
+    endTime: z.string().min(1, "End time is required"),
+});
+
+export const classSchema = z.object({
+    name: z
+        .string()
+        .min(2, "Class name must be at least 2 characters")
+        .max(50, "Class name must be at most 50 characters"),
+    description: z
+        .string({ required_error: "Description is required" })
+        .min(5, "Description must be at least 5 characters"),
+    subjectId: z.coerce
+        .number({
+            required_error: "Subject is required",
+            invalid_type_error: "Subject is required",
+        })
+        .min(1, "Subject is required"),
+    teacherId: z.string().min(1, "Teacher is required"),
+    capacity: z.coerce
+        .number({
+            required_error: "Capacity is required",
+            invalid_type_error: "Capacity is required",
+        })
+        .min(1, "Capacity must be at least 1"),
+    status: z.enum(["active", "inactive"]),
+    bannerUrl: z
+        .string({ required_error: "Class banner is required" })
+        .min(1, "Class banner is required"),
+    bannerCldPubId: z
+        .string({ required_error: "Banner reference is required" })
+        .min(1, "Banner reference is required"),
+    inviteCode: z.string().optional(),
+    schedules: z.array(scheduleSchema).optional(),
+});
+
+export const enrollmentSchema = z.object({
+    classId: z.coerce
+        .number({
+            required_error: "Class ID is required",
+            invalid_type_error: "Class ID is required",
+        })
+        .min(1, "Class ID is required"),
+    studentId: z.string().min(1, "Student ID is required"),
+});
+```
+Now to craete the form, go back to create.tsx and import the `<createView>` component from Refine with a `classname` setted as `<class-view>`, inside a `<breadcrum> `component. Inside start building the `form`, you will notice that as ussing the `<Button>` component from `components>ui`, inside is used the `useBack` hook from `refinedev/core`. Also, you be using the component `<separator>` from components>ui too. Then using the card components in components>ui build a card to hold inside the form, and this one will be a clasic react hook form (look up on [shadcn](https://ui.shadcn.com/) the anatomy for the form).
+
+Create Form should look like this:
+```ts
+import { CreateView } from "@/components/refine-ui/views/create-view.tsx";
+import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { useBack } from "@refinedev/core";
+import { Separator } from "@/components/ui/separator.tsx";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "@refinedev/react-hook-form"
+import { classSchema } from "@/lib/schema.ts";
+import * as z from "zod";
+
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form"
+
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
+import { Textarea } from "@/components/ui/textarea.tsx";
+import { Loader2 } from "lucide-react";
+import UploadWidget from "@/components/upload-widget";
+
+
+const Create = () => {
+    const back = useBack();
+
+    const form = useForm({
+        resolver: zodResolver(classSchema),
+        refineCoreProps: {
+            resource: "classes",
+            action: "create",
+        },
+        /* defaultValues: {
+            status: "active", //now the name prop value in FormField doesn't complain 
+        }, */
+    });
+
+    const {
+        handleSubmit,
+        formState: { isSubmitting, errors },
+        control,
+    } = form;
+
+    const onSubmit = async (values: z.infer<typeof classSchema>) => {
+        try {
+            console.log(values);
+        } catch (error) {
+            console.error("Error creating class:", error);
+        }
+    };
+
+    const teachers = [
+        {
+            id: 1,
+            name: "John Doe",
+        },
+        {
+            id: 2,
+            name: "Jane Doe",
+        },
+    ];
+
+    const subjects = [
+        {
+            id: 1,
+            name: "Math",
+            code: "MATH",
+        },
+        {
+            id: 2,
+            name: "English",
+            code: "ENG",
+        },
+    ];
+
+    const bannerPublicId = form.watch('bannerCldPubId');
+
+    const setBannerImage = (file: any, field: any) => {
+        if (file) {
+            field.onChange(file.url);
+            form.setValue('bannerCldPubId', file.publicId, {
+                shouldValidate: true,       //reruns zod validations after submit
+                shouldDirty: true,          // marks the form as modified as sun the image is loaded
+            })
+        } else {
+            field.onChange('');
+            form.setValue('bannerCldPubId', '', {
+                shouldValidate: true,
+                shouldDirty: true
+            })
+        }
+    }
+    return (
+        <CreateView className="class-view">
+            <Breadcrumb />
+
+            <h1 className="page-title">Create a Class</h1>
+            <div className="intro-row">
+                <p>Provide the required information below to add a class.</p>
+                <Button onClick={() => back()}>Go Back</Button>
+            </div>
+
+            <Separator />
+
+            <div className="my-4 flex items-center">
+                <Card className="class-form-card">
+                    <CardHeader className="relative z-10">
+                        <CardTitle className="text-2xl pb-0 font-bold text-gradient-orange">
+                            Fill out form
+                        </CardTitle>
+                    </CardHeader>
+
+                    <Separator />
+
+                    <CardContent className="mt-7">
+                        <Form {...form}>
+                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                                <FormField
+                                    control={control}
+                                    name="bannerUrl"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>
+                                                Banner Image <span className="text-orange-600">*</span>
+                                            </FormLabel>
+                                            <FormControl>
+                                                <UploadWidget
+                                                    value={field.value ? { url: field.value, publicId: bannerPublicId ?? '' } : null}
+                                                    onChange={(file: any) => setBannerImage(file, field)}
+                                                />
+                                            </FormControl>
+                                            <FormMessage /> {errors.bannerCldPubId && !errors.bannerUrl && (
+                                                <p className="text-destructive text-sm">
+                                                    {errors.bannerCldPubId.message?.toString()}
+                                                </p>
+                                            )}
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={control}
+                                    name="name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>
+                                                Class Name <span className="text-orange-600">*</span>
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Introduction to Biology - Section A"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <div className="grid sm:grid-cols-2 gap-4">
+                                    <FormField
+                                        control={control}
+                                        name="subjectId"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Subject <span className="text-orange-600">*</span>
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={(value) =>
+                                                        field.onChange(Number(value))
+                                                    }
+                                                    value={field.value?.toString()}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue placeholder="Select a subject" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {subjects.map((subject) => (
+                                                            <SelectItem
+                                                                key={subject.id}
+                                                                value={subject.id.toString()}
+                                                            >
+                                                                {subject.name} ({subject.code})
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={control}
+                                        name="teacherId"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Teacher <span className="text-orange-600">*</span>
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={field.onChange}
+                                                    value={field.value}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue placeholder="Select a teacher" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {teachers.map((teacher) => (
+                                                            <SelectItem
+                                                                key={teacher.id}
+                                                                value={teacher.id.toString()}
+                                                            >
+                                                                {teacher.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="grid sm:grid-cols-2 gap-4">
+                                    <FormField
+                                        control={control}
+                                        name="capacity"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Capacity</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="30"
+                                                        onChange={(e) => {
+                                                            const value = e.target.value;
+                                                            field.onChange(value ? Number(value) : undefined);
+                                                        }}
+                                                        value={(field.value as number | undefined) ?? ""}
+                                                        name={field.name}
+                                                        ref={field.ref}
+                                                        onBlur={field.onBlur}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={control}
+                                        name="status"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Status <span className="text-orange-600">*</span>
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={field.onChange}
+                                                    value={field.value}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue placeholder="Select status" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="active">Active</SelectItem>
+                                                        <SelectItem value="inactive">Inactive</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <FormField
+                                    control={control}
+                                    name="description"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Description</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    placeholder="Brief description about the class"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <Separator />
+
+                                <Button type="submit" size="lg" className="w-full">
+                                    {isSubmitting ? (
+                                        <div className="flex gap-1">
+                                            <span>Creating Class...</span>
+                                            <Loader2 className="inline-block ml-2 animate-spin" />
+                                        </div>
+                                    ) : (
+                                        "Create Class"
+                                    )}
+                                </Button>
+                            </form>
+                        </Form>
+                    </CardContent>
+                </Card>
+            </div>
+        </CreateView>
+    );
+};
+
+export default Create;
+```
+Now address components folder and at the same level as refine-ui and ui, craete a file called upload-widget.tsx. This widget from claudinary would be in charge of the uploads images files.
+```tsx
+import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET } from "@/constants"
+import { UploadWidgetValue } from "@/types/types"
+import { UploadCloud } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+
+const UploadWidget = ({ value = null, onChange, disabled = false }) => {
+    const widgetRef = useRef<CloudinaryWidget | null>(null) //this persists the widget across renders
+    const onChangeRef = useRef(onChange) //ref to handle changes
+
+
+    const [preview, setpreview] = useState<UploadWidgetValue | null>(value)
+    /* const [deleteToken, setDeleteToken] = useState<string | null>(null)   */   //use to side-client delition
+    const [isRemoving, setIsRemoving] = useState(false) //handle UI while removing something
+
+    //opens up the widget
+    useEffect(() => {
+        setpreview(value);
+        /* if (!value) setDeleteToken(null) */
+    }, [value]);
+
+    //always keep the latest change parameter
+    useEffect(() => {
+        onChangeRef.current = onChange;
+    }, [onChange])
+
+    //Initialize the claudinary widget
+    useEffect(() => {
+        if (typeof window === 'undefined') return; //only works on browser
+
+        const initializeWidget = () => {
+            if (!window.cloudinary || widgetRef.current) return false; //exist if claudinary isn't loaded or, if a widget already exist
+
+            widgetRef.current = window.cloudinary.createUploadWidget({
+                cloudName: CLOUDINARY_CLOUD_NAME,
+                uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+                multiple: false,
+                folder: 'uploads',
+                maxFileSize: 5000000, //this is 5 MB
+                clientAllowedFormats: ['png', 'jpg', 'jpeg', 'webp']
+
+            }, (error, result) => {
+                if (!error && result.event === 'success') {
+                    const payload: UploadWidgetValue = {
+                        url: result.info.secure_url,
+                        publicId: result.info.public_id
+                    }
+
+                    setpreview(payload);
+
+                    /* setDeleteToken(result.info.delete_token ?? null); */ //enables deleting image 
+                    onChangeRef.current?.(payload)
+                }
+            });
+            return true;
+        }
+
+        if (initializeWidget()) return;
+
+        const intervalId = window.setInterval(() => {
+            if (initializeWidget()) {
+                window.clearInterval(intervalId)
+            }
+        }, 500)
+
+        //clean up function
+        return () => window.clearInterval(intervalId)
+    }, [])
 
 
 
-If name or code is typed in the search bar, it should work. Now, to implement the mechanism to make the deparment's filter through the display list element a get request that calls the department router, and then display it (instead of the 'fake' data currently being displayed).
+    const openWidget = () => {
+        if (!disabled) widgetRef.current?.open();
+    }
+
+    /*  const removeFromClaudinary = async () => {
+ 
+     } */
+
+    return (
+        <div className="space-y-2">
+            {preview ? (
+                <div className="upload-preview">
+                    <img src={preview.url} alt="uploaded-file " />
+                </div>
+            ) : <div
+                className="upload-dropzone"
+                role="button"
+                aria-disabled={disabled}
+                tabIndex={disabled ? -1 : 0}
+                onClick={openWidget}
+                onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        openWidget();
+                    }
+                }}>
+                <div className="upload-prompt">
+                    <UploadCloud className="icon" />
+                    <div>
+                        <p>Click to upload photo</p>
+                        <p>PNG, JPG up to 5MB</p>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+    )
+}
+
+export default UploadWidget
+```
+To address the 
+
+
+## backend with better auth 
+
+
 
