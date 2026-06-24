@@ -2242,7 +2242,7 @@ Whitin it open a new JSON object:
 {
     "rewrites":[
         {
-            "source": "/(.*)",     "_comment": "any route but the homepage",  
+            "source": "/(.*)",     //any route but the homepage  
             "destination": "/client/mngt-frontend/index.html"
         }
     ]
