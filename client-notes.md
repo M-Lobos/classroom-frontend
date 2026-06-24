@@ -2217,3 +2217,51 @@ const Create = () => {
     //rest of the code with no changes
 ```
 Now, try and create a new class... at this point as the list hasn't been created yet... nothing will be renderd. But the new class created can be seen a the Database on Neon, by selecting the classes table
+
+## Deploying Frontend project.
+Go to [vercel](https://vercel.com/).
+
+Create sing-in and import the git hub repository, preset the app to Vite if Vercel doesn't identify it it self. Then proceed to enter the envirorment variables. Notice the env variable is setted to the develpment url, so replace it with the production url wich is the url given by Railway. Then deploy it.
+
+Now if you go to the page, and click subjects for example you should experience an error to fetch... thats cause the backend hasn't been connected properly to production yet. In fact, it is CORS who is blocking it (remember it is allowing only the localhost:5173). 
+
+So, go back to the backend project now
+
+## Dealing with the refresh router problem btn Vercel and Vite
+
+When reloading the page, a 404 is likely to appear. This one come from this side (no the server or backend side of the project). Is a classic SPA routing issue with vite and vercel: The app is ussing client-side routing from one component to another (e.g., dashboard to subjects), but pages do not exist as real files, so when refreshing, Vercel tries to find them and it can't. Is React the one who has to handle the routing. The solution is quite straightfoward.
+
+Create a new file in the root of the project, called vercel.json.
+```bash
+pwd
+cd client/mngt-frontend
+touch vercel.json
+```
+Whitin it open a new JSON object:
+```json
+{
+    "rewrites":[
+        {
+            "source": "/(.*)",     "_comment": "any route but the homepage",  
+            "destination": "/client/mngt-frontend/index.html"
+        }
+    ]
+}
+```
+
+Then push up the changes
+```bash
+pwd
+git status
+git add .
+git commit -m "ft: correcting routes problems btn Vercel and Vite"
+git push
+```
+
+
+## Web RUM (real user monitoring) feature from 24/7
+
+Once sign in in 24/7 go to APM (Application Performance Monitoring) on the left bar. Whitin,go to Web RUM and click add application.
+
+Notice that theres is some field Site 24/7 is asking for. One of them is the frontend url, an url that hasn't been yet deployed.
+
