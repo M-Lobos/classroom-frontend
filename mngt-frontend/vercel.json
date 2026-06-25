@@ -2,7 +2,7 @@
     "rewrites":[
         {
             "source": "/(.*)",     
-            "destination": "/client/mngt-frontend/index.html"
+            "destination": "/index.html"
         }
     ]
 }
