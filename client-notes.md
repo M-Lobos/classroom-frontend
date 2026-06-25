@@ -2248,7 +2248,6 @@ Whitin it open a new JSON object:
     ]
 }
 ```
-
 Then push up the changes
 ```bash
 pwd
@@ -2258,10 +2257,68 @@ git commit -m "ft: correcting routes problems btn Vercel and Vite"
 git push
 ```
 
-
 ## Web RUM (real user monitoring) feature from 24/7
 
 Once sign in in 24/7 go to APM (Application Performance Monitoring) on the left bar. Whitin,go to Web RUM and click add application.
 
-Notice that theres is some field Site 24/7 is asking for. One of them is the frontend url, an url that hasn't been yet deployed.
+Notice that theres is some field Site 24/7 is asking for. One of them is the frontend url, paste the frontend url just deployed. Below, toggle from traditional to SPA, click save (this may take some seconds).
 
+Copy the script provided and add it at the top of the `<head>` whitin the index.html at the root of the project, just above the tittle.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="refine | Build your React-based CRUD applications, without constraints." />
+  <meta data-rh="true" property="og:image" content="https://refine.dev/img/refine_social.png" />
+  <meta data-rh="true" name="twitter:image" content="https://refine.dev/img/refine_social.png" />
+  <script type="text/javascript">
+    (function (w, d, s, r, k, h, m) {
+      if (w.performance && w.performance.timing && w.performance.navigation && !w.s247r) {
+        w[r] = w[r] || function () { (w[r].q = w[r].q || []).push(arguments) };
+        h = d.createElement('script'); h.async = true; h.setAttribute('src', s + k);
+        d.getElementsByTagName('head')[0].appendChild(h);
+        (m = window.onerror), (window.onerror = function (b, c, d, f, g) {
+          m && m(b, c, d, f, g), g || (g = new Error(b)), (w[r].q = w[r].q || []).push(["captureException", g]);
+        })
+      }
+    })(window, document, '//static.site24x7rum.com/beacon/site24x7rum-min.js?appKey=', 's247r', 'ef456341052227518e9af089ce80b3c8');
+  </script>
+  <title>
+    Refine - Build your React-based CRUD applications, without constraints.
+  </title>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+  <script type="module" src="/src/index.tsx"></script>
+  <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+  <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm dev` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+</body>
+
+</html>
+```
+Push this changes to production 
+```bash
+pwd
+status
+git add . 
+git commit -m "ft: RUM from site 24/7 implemented "
+git push 
+
+```
