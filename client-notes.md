@@ -2320,5 +2320,5 @@ status
 git add . 
 git commit -m "ft: RUM from site 24/7 implemented "
 git push 
-
 ```
+Wait until Vercel redployes the changes. Go back to SIte 24/7, paste the application's url in the input box just below where the code was provided. Click Verify. Wait until appears a message telling the RUM's script has been identified on the website 
