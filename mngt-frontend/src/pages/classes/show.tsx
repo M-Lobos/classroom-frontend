@@ -48,7 +48,6 @@ function ClassesShow() {
         description,
         status,
         capacity,
-        bannerUrl,
         bannerCldPubId,
         subject,
         teacher,
@@ -59,7 +58,7 @@ function ClassesShow() {
             <ShowViewHeader resource='classes' title='Class Details' />
 
             <div className='banner'>
-                {bannerUrl ? (
+                {bannerCldPubId ? (
                     <AdvancedImage alt="Class Banner" cldImg={bannerPhoto(bannerCldPubId ?? '', name)} />
 
                 ) :
@@ -76,7 +75,7 @@ function ClassesShow() {
                     <div>
                         <Badge variant="outline"> {capacity} spots</Badge>
                         <Badge
-                            variant={status == 'active' ? 'default' : 'secondary'}
+                            variant={status === 'active' ? 'default' : 'secondary'}
                             data-status={status}>
                             {status.toUpperCase()}
                         </Badge>
