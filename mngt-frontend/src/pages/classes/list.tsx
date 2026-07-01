@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CreateButton } from "@/components/refine-ui/buttons/create.tsx";
 import { DataTable } from "@/components/refine-ui/data-table/data-table.tsx";
 import { useTable } from "@refinedev/react-table";
-import { ClassDetails, Subject, User } from "../../types/types.js";
+import { ClassDetails, Subject, User } from "@/types/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge.tsx";
 import { useList } from "@refinedev/core";
