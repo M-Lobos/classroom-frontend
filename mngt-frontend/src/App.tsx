@@ -11,14 +11,15 @@ import { Toaster } from "./components/refine-ui/notification/toaster";
 import { useNotificationProvider } from "./components/refine-ui/notification/use-notification-provider";
 import { ThemeProvider } from "./components/refine-ui/theme/theme-provider";
 import Dashboard from "./pages/Dashboard";
-import { BookOpen, GraduationCap, Home } from "lucide-react";
+import { BookOpen, Building2, GraduationCap, Home } from "lucide-react";
 import { Layout } from "./components/refine-ui/layout/layout";
 import SubjectList from "./pages/subjects/List";
 import SubjectsCreate from "./pages/subjects/Create";
 import { dataProvider } from "./providers/restData";
-import ClassesList from "./pages/classes/list";
-import ClassesCreate from "./pages/classes/create";
+import ClassesList from "./pages/classes/List";
+import ClassesCreate from "./pages/classes/Create"
 import ClassesShow from "./pages/classes/show";
+import DepartmentsCreate from "./pages/departments/Create"
 
 function App() {
   return (
@@ -62,6 +63,15 @@ function App() {
                     icon: <GraduationCap />
                   }
                 },
+                {
+                  name: 'departments',
+                  list: '/departments',
+                  create: '/departments/create',
+                  meta: {
+                    label: 'Departments',
+                    icon: <Building2 />
+                  }
+                }
               ]}
             >
               <Routes>
@@ -82,7 +92,12 @@ function App() {
                     <Route index element={<ClassesList />} />
                     <Route path="create" element={<ClassesCreate />} />
                     <Route path="show/:id" element={<ClassesShow />} />
+                  </Route>
 
+                  <Route path="/departments">
+                    <Route index element={<ClassesList />} />
+                    <Route path="create" element={<DepartmentsCreate />} />
+                    <Route path="show/:id" element={<ClassesShow />} />
                   </Route>
 
                 </Route>
