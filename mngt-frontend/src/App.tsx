@@ -18,9 +18,10 @@ import SubjectsCreate from "./pages/subjects/Create";
 import { dataProvider } from "./providers/restData";
 import ClassesList from "./pages/classes/List";
 import CreateClasses from "./pages/classes/Create";
-import ClassesShow from "./pages/classes/show"
+import ClassesShow from "./pages/classes/show";
 import DepartmentsCreate from "./pages/departments/Create";
 import DepartmentList from "./pages/departments/List";
+import DepartmentShow from "./pages/departments/Show"
 
 function App() {
   return (
@@ -98,7 +99,7 @@ function App() {
                   <Route path="/departments">
                     <Route index element={<DepartmentList />} />
                     <Route path="create" element={<DepartmentsCreate />} />
-                    <Route path="show/:id" element={<ClassesShow />} />
+                    <Route path="show/:id" element={<DepartmentShow />} />
                   </Route>
 
                 </Route>
