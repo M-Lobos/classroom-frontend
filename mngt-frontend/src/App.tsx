@@ -20,6 +20,7 @@ import ClassesList from "./pages/classes/List";
 import ClassesCreate from "./pages/classes/Create"
 import ClassesShow from "./pages/classes/show";
 import DepartmentsCreate from "./pages/departments/Create"
+import DepartmentList from "./pages/departments/List";
 
 function App() {
   return (
@@ -40,7 +41,7 @@ function App() {
                   name: 'dashboard',
                   list: '/',
                   meta: {
-                    label: 'home',
+                    label: 'Home',
                     icon: <Home />
                   }
                 },
@@ -95,7 +96,7 @@ function App() {
                   </Route>
 
                   <Route path="/departments">
-                    <Route index element={<ClassesList />} />
+                    <Route index element={<DepartmentList />} />
                     <Route path="create" element={<DepartmentsCreate />} />
                     <Route path="show/:id" element={<ClassesShow />} />
                   </Route>

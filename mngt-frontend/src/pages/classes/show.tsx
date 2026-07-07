@@ -17,8 +17,6 @@ function ClassesShow() {
 
     const { isLoading, isError } = query;
 
-    console.log(classDetails);
-
     if (isLoading || isError || !classDetails) {
         return (
             <ShowView className='class-view class-show'>
