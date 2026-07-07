@@ -69,7 +69,7 @@ function App() {
                   name: 'departments',
                   list: '/departments',
                   create: '/departments/create',
-                  show: '/classes/show/:id',
+                  show: '/departments/show/:id',
                   meta: {
                     label: 'Departments',
                     icon: <Building2 />
