@@ -17,7 +17,7 @@ import SubjectList from "./pages/subjects/List";
 import SubjectsCreate from "./pages/subjects/Create";
 import { dataProvider } from "./providers/restData";
 import ClassesList from "./pages/classes/List"
-import ClassesCreate from "./pages/classes/Create"
+import CreateClasses from "./pages/classes/Create"
 import ClassesShow from "./pages/classes/show";
 import DepartmentsCreate from "./pages/departments/Create"
 import DepartmentList from "./pages/departments/List";
@@ -91,7 +91,7 @@ function App() {
 
                   <Route path="/classes">
                     <Route index element={<ClassesList />} />
-                    <Route path="create" element={<ClassesCreate />} />
+                    <Route path="create" element={<CreateClasses />} />
                     <Route path="show/:id" element={<ClassesShow />} />
                   </Route>
 

@@ -195,4 +195,4 @@ const ClassesList = () => {
     )
 }
 
-export default ClassesList
+export default ClassesList;
