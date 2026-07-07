@@ -16,7 +16,7 @@ import { Layout } from "./components/refine-ui/layout/layout";
 import SubjectList from "./pages/subjects/List";
 import SubjectsCreate from "./pages/subjects/Create";
 import { dataProvider } from "./providers/restData";
-import ClassesList from "./pages/classes/List";
+import ClassesList from "./pages/classes/List"
 import ClassesCreate from "./pages/classes/Create"
 import ClassesShow from "./pages/classes/show";
 import DepartmentsCreate from "./pages/departments/Create"
