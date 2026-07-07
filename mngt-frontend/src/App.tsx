@@ -16,10 +16,10 @@ import { Layout } from "./components/refine-ui/layout/layout";
 import SubjectList from "./pages/subjects/List";
 import SubjectsCreate from "./pages/subjects/Create";
 import { dataProvider } from "./providers/restData";
-import ClassesList from "./pages/classes/List"
-import CreateClasses from "./pages/classes/Create"
-import ClassesShow from "./pages/classes/show";
-import DepartmentsCreate from "./pages/departments/Create"
+import ClassesList from "./pages/classes/List";
+import CreateClasses from "./pages/classes/Create";
+import ClassesShow from "./pages/classes/show"
+import DepartmentsCreate from "./pages/departments/Create";
 import DepartmentList from "./pages/departments/List";
 
 function App() {
