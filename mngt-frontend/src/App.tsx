@@ -11,7 +11,7 @@ import { Toaster } from "./components/refine-ui/notification/toaster";
 import { useNotificationProvider } from "./components/refine-ui/notification/use-notification-provider";
 import { ThemeProvider } from "./components/refine-ui/theme/theme-provider";
 import Dashboard from "./pages/Dashboard";
-import { BookOpen, Building2, GraduationCap, Home, Users } from "lucide-react";
+import { BookOpen, Building2, ClipboardCheck, GraduationCap, Home, Users } from "lucide-react";
 import { Layout } from "./components/refine-ui/layout/layout";
 import SubjectList from "./pages/subjects/List";
 import SubjectsCreate from "./pages/subjects/Create";
@@ -24,6 +24,7 @@ import DepartmentList from "./pages/departments/List";
 import DepartmentShow from "./pages/departments/Show"
 import FacultyList from "./pages/faculty/list"
 import FacultyShow from "./pages/faculty/show"
+import EnrollmentCreate from "./pages/enrollments/create"
 
 function App() {
   return (
@@ -77,6 +78,15 @@ function App() {
                   },
                 },
                 {
+                  name: "enrollments",
+                  list: "/enrollments/create",
+                  create: "/enrollments/create",
+                  meta: {
+                    label: "Enrollments",
+                    icon: <ClipboardCheck />
+                  }
+                },
+                {
                   name: 'classes',
                   list: '/classes',
                   create: '/classes/create',
@@ -112,6 +122,10 @@ function App() {
                   <Route path="faculty">
                     <Route index element={<FacultyList />} />
                     <Route path="show/:id" element={<FacultyShow />} />
+                  </Route>
+
+                  <Route path="enrollments">
+                    <Route path="create" element={<EnrollmentCreate />} />
                   </Route>
 
                   <Route path="/classes">
