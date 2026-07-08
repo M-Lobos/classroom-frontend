@@ -11,7 +11,7 @@ import { Toaster } from "./components/refine-ui/notification/toaster";
 import { useNotificationProvider } from "./components/refine-ui/notification/use-notification-provider";
 import { ThemeProvider } from "./components/refine-ui/theme/theme-provider";
 import Dashboard from "./pages/Dashboard";
-import { BookOpen, Building2, GraduationCap, Home } from "lucide-react";
+import { BookOpen, Building2, GraduationCap, Home, Users } from "lucide-react";
 import { Layout } from "./components/refine-ui/layout/layout";
 import SubjectList from "./pages/subjects/List";
 import SubjectsCreate from "./pages/subjects/Create";
@@ -22,6 +22,8 @@ import ClassesShow from "./pages/classes/Show";
 import DepartmentsCreate from "./pages/departments/Create";
 import DepartmentList from "./pages/departments/List";
 import DepartmentShow from "./pages/departments/Show"
+import FacultyList from "./pages/faculty/list"
+import FacultyShow from "./pages/faculty/show"
 
 function App() {
   return (
@@ -56,6 +58,25 @@ function App() {
                   }
                 },
                 {
+                  name: 'departments',
+                  list: '/departments',
+                  create: '/departments/create',
+                  show: '/departments/show/:id',
+                  meta: {
+                    label: 'Departments',
+                    icon: <Building2 />
+                  }
+                },
+                {
+                  name: "users",
+                  list: "/faculty",
+                  show: "/faculty/show/:id",
+                  meta: {
+                    label: "Faculty",
+                    icon: <Users />,
+                  },
+                },
+                {
                   name: 'classes',
                   list: '/classes',
                   create: '/classes/create',
@@ -65,16 +86,6 @@ function App() {
                     icon: <GraduationCap />
                   }
                 },
-                {
-                  name: 'departments',
-                  list: '/departments',
-                  create: '/departments/create',
-                  show: '/departments/show/:id',
-                  meta: {
-                    label: 'Departments',
-                    icon: <Building2 />
-                  }
-                }
               ]}
             >
               <Routes>
@@ -91,17 +102,24 @@ function App() {
                     <Route path="create" element={<SubjectsCreate />} />
                   </Route>
 
-                  <Route path="/classes">
-                    <Route index element={<ClassesList />} />
-                    <Route path="create" element={<CreateClasses />} />
-                    <Route path="show/:id" element={<ClassesShow />} />
-                  </Route>
 
                   <Route path="/departments">
                     <Route index element={<DepartmentList />} />
                     <Route path="create" element={<DepartmentsCreate />} />
                     <Route path="show/:id" element={<DepartmentShow />} />
                   </Route>
+
+                  <Route path="faculty">
+                    <Route index element={<FacultyList />} />
+                    <Route path="show/:id" element={<FacultyShow />} />
+                  </Route>
+
+                  <Route path="/classes">
+                    <Route index element={<ClassesList />} />
+                    <Route path="create" element={<CreateClasses />} />
+                    <Route path="show/:id" element={<ClassesShow />} />
+                  </Route>
+
 
                 </Route>
               </Routes>
