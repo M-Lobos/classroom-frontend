@@ -25,6 +25,8 @@ import DepartmentShow from "./pages/departments/Show"
 import FacultyList from "./pages/faculty/list"
 import FacultyShow from "./pages/faculty/show"
 import EnrollmentCreate from "./pages/enrollments/create"
+import EnrollmentJoin from "./pages/enrollments/join";
+import EnrollmentConfirm from "./pages/enrollments/confirm";
 
 function App() {
   return (
@@ -126,6 +128,8 @@ function App() {
 
                   <Route path="enrollments">
                     <Route path="create" element={<EnrollmentCreate />} />
+                    <Route path="join" element={<EnrollmentJoin />} />
+                    <Route path="confirm" element={<EnrollmentConfirm />} />
                   </Route>
 
                   <Route path="/classes">
