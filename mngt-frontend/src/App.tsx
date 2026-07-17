@@ -1,10 +1,13 @@
-import { Refine, /* WelcomePage */ } from "@refinedev/core";
+import { Authenticated, Refine, /* WelcomePage */ } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
+
 import routerProvider, {
   DocumentTitleHandler,
+  NavigateToResource,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
+
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
 import "./App.css";
 import { Toaster } from "./components/refine-ui/notification/toaster";
@@ -15,6 +18,11 @@ import { BookOpen, Building2, ClipboardCheck, GraduationCap, Home, Users } from 
 import { Layout } from "./components/refine-ui/layout/layout";
 import SubjectList from "./pages/subjects/List";
 import SubjectsCreate from "./pages/subjects/Create";
+
+//authProvider from providers/auth
+import { authProvider } from "./providers/auth";
+import { Login } from "./pages/login";
+
 import { dataProvider } from "./providers/restData";
 import ClassesList from "./pages/classes/List";
 import CreateClasses from "./pages/classes/Create";
@@ -28,6 +36,7 @@ import EnrollmentCreate from "./pages/enrollments/create"
 import EnrollmentJoin from "./pages/enrollments/join";
 import EnrollmentConfirm from "./pages/enrollments/confirm";
 
+
 function App() {
   return (
     <BrowserRouter>
@@ -36,6 +45,7 @@ function App() {
           <DevtoolsProvider>
             <Refine
               dataProvider={dataProvider}
+              authProvider={authProvider}
               notificationProvider={useNotificationProvider()}
               routerProvider={routerProvider}
               options={{
@@ -102,11 +112,27 @@ function App() {
             >
               <Routes>
                 <Route element={
-                  <Layout>
-                    <Outlet />
-                  </Layout>
-                }>
+                  <Authenticated key="public-routes" fallback={<Outlet />}>
+                    <NavigateToResource fallbackTo="/" />
+                  </Authenticated>
 
+                  /* {<Layout>
+                    <Outlet />
+                  </Layout>} */
+
+                }>
+                  <Route path="/login" element={<Login />} />
+                  {/* <Route path="/register" element={<Register/>} /> */}
+                </Route>
+
+                <Route
+                /* Authenticated must be implemented still */
+                  element={
+                    <Layout>
+                      <Outlet />
+                    </Layout>
+                  }
+                >
                   <Route path="/" element={<Dashboard />} />
 
                   <Route path="/subjects">
@@ -150,7 +176,7 @@ function App() {
           </DevtoolsProvider>
         </ThemeProvider>
       </RefineKbarProvider>
-    </BrowserRouter>
+    </BrowserRouter >
   );
 }
 
