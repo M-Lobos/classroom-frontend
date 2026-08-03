@@ -22,6 +22,7 @@ import SubjectsCreate from "./pages/subjects/Create";
 //authProvider from providers/auth
 import { authProvider } from "./providers/auth";
 import { Login } from "./pages/login";
+import { Register } from "./pages/register";
 
 import { dataProvider } from "./providers/restData";
 import ClassesList from "./pages/classes/List";
@@ -115,22 +116,20 @@ function App() {
                   <Authenticated key="public-routes" fallback={<Outlet />}>
                     <NavigateToResource fallbackTo="/" />
                   </Authenticated>
-
-                  /* {<Layout>
-                    <Outlet />
-                  </Layout>} */
-
                 }>
+
                   <Route path="/login" element={<Login />} />
-                  {/* <Route path="/register" element={<Register/>} /> */}
+                  <Route path="/register" element={<Register />} />
                 </Route>
 
                 <Route
-                /* Authenticated must be implemented still */
+
                   element={
-                    <Layout>
-                      <Outlet />
-                    </Layout>
+                    <Authenticated key="private-routes" fallback={<Login />}>
+                      <Layout>
+                        <Outlet />
+                      </Layout>
+                    </Authenticated>
                   }
                 >
                   <Route path="/" element={<Dashboard />} />
@@ -175,7 +174,7 @@ function App() {
             <DevtoolsPanel />
           </DevtoolsProvider>
         </ThemeProvider>
-      </RefineKbarProvider>
+      </RefineKbarProvider >
     </BrowserRouter >
   );
 }
